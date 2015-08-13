@@ -10,6 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftCreature;
 import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -30,11 +32,12 @@ public class MountSnake extends Mount {
 
         if (owner == null) return;
         color = MathUtils.randomRangeInt(0, 14);
-        ((LivingEntity)ent).setNoDamageTicks(Integer.MAX_VALUE);
+        ((LivingEntity) ent).setNoDamageTicks(Integer.MAX_VALUE);
         ((Sheep) ent).setColor(DyeColor.values()[color]);
         tailMap.put(getPlayer(), new ArrayList());
         ((ArrayList) tailMap.get(getPlayer())).add(ent);
         addSheepToTail(4);
+        Core.registerListener(this);
     }
 
     @Override
@@ -108,11 +111,20 @@ public class MountSnake extends Mount {
                 loc.subtract(player.getLocation().getDirection().setY(0));
             }
             Sheep tail = (loc.getWorld().spawn(loc, Sheep.class));
-            ((LivingEntity)tail).setNoDamageTicks(Integer.MAX_VALUE);
+            ((LivingEntity) tail).setNoDamageTicks(Integer.MAX_VALUE);
             tail.setRemoveWhenFarAway(false);
             tail.teleport(loc);
             ((ArrayList) tailMap.get(player)).add(tail);
             tail.setColor(DyeColor.values()[color]);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        try {
+            if (tailMap.get(getPlayer()).contains(event.getEntity()))
+                event.setCancelled(true);
+        } catch (Exception exc) {
         }
     }
 
