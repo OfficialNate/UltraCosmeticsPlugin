@@ -134,7 +134,7 @@ public class GadgetEtherealPearl extends Gadget implements Listener {
                 // && event.getEntity().getPassenger() == getPlayer()
                 if (runnableHashMap.containsKey(event.getEntity().getPassenger())) {
                     Bukkit.broadcastMessage("c");
-                    if (((Player) event.getEntity().getPassenger()).getName().equals(getPlayer().getName())){
+                    if (((Player) event.getEntity().getPassenger()).getConfigName().equals(getPlayer().getConfigName())){
                         Bukkit.broadcastMessage("d");
                         getPlayer().eject();
                         runnableHashMap.remove( event.getEntity().getPassenger());

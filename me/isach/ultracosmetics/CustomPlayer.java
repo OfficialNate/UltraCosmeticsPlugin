@@ -41,7 +41,7 @@ public class CustomPlayer {
 
     public void removeGadget() {
         if (currentGadget != null) {
-            getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Unequip").replaceAll("%gadgetname%", currentGadget.getName()));
+            getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Unequip").replaceAll("%gadgetname%", currentGadget.getConfigName()));
             currentGadget.clear();
             currentGadget.removeItem();
             currentGadget = null;

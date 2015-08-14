@@ -28,7 +28,7 @@ public abstract class Gadget implements Listener {
 
     private Material material;
     private Byte data;
-    private String name;
+    private String configName;
     private double countdown;
 
     private GadgetType type = GadgetType.DEFAULT;
@@ -39,10 +39,10 @@ public abstract class Gadget implements Listener {
 
     private UUID owner;
 
-    public Gadget(Material material, Byte data, String name, String permission, final float countdown, final UUID owner, final GadgetType type) {
+    public Gadget(Material material, Byte data, String configName, String permission, final float countdown, final UUID owner, final GadgetType type) {
         this.material = material;
         this.data = data;
-        this.name = name;
+        this.configName = configName;
         this.permission = permission;
         this.countdown = countdown;
         this.type = type;
@@ -70,14 +70,14 @@ public abstract class Gadget implements Listener {
                 getPlayer().getWorld().dropItem(getPlayer().getLocation(), getPlayer().getInventory().getItem((int) SettingsManager.getConfig().get("Gadget-Slot")));
                 getPlayer().getInventory().remove((int) SettingsManager.getConfig().get("Gadget-Slot"));
             }
-            getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), ItemFactory.create(material, data, name, "§9Gadget"));
-            getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Equip").replaceAll("%gadgetname%", getName()));
+            getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), ItemFactory.create(material, data, getConfigName(), "§9Gadget"));
+            getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Equip").replaceAll("%gadgetname%", getConfigName()));
             Core.getCustomPlayer(getPlayer()).currentGadget = this;
         }
     }
 
-    public String getName() {
-        return this.name;
+    public String getConfigName() {
+        return MessageManager.getMessage("Gadgets." + configName + ".configName");
     }
 
     public Material getMaterial() {
@@ -158,7 +158,7 @@ public abstract class Gadget implements Listener {
                 if (Core.countdownMap.get(getPlayer()).containsKey(getType())) {
                     String timeLeft = new DecimalFormat("0.0").format(Core.countdownMap.get(getPlayer()).get(getType()));
                     if (displayCountdownMessage)
-                        getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Countdown-Message").replaceAll("%gadgetname%", name).replaceAll("%time%", timeLeft));
+                        getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Countdown-Message").replaceAll("%gadgetname%", configName).replaceAll("%time%", timeLeft));
                     return;
                 } else {
                     Core.countdownMap.get(getPlayer()).put(getType(), countdown);
@@ -183,7 +183,7 @@ public abstract class Gadget implements Listener {
             if (event.getItemDrop().getItemStack().getType() == material
                     && event.getItemDrop().getItemStack().getData().getData() == data
                     && event.getItemDrop().getItemStack().getItemMeta().hasDisplayName()
-                    && event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals(name)) {
+                    && event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals(configName)) {
                 event.setCancelled(true);
             }
         }
@@ -193,7 +193,7 @@ public abstract class Gadget implements Listener {
             if (event.getCurrentItem().getType() == material
                     && event.getCurrentItem().getData().getData() == data
                     && event.getCurrentItem().getItemMeta().hasDisplayName()
-                    && event.getCurrentItem().getItemMeta().getDisplayName().equals(name)) {
+                    && event.getCurrentItem().getItemMeta().getDisplayName().equals(configName)) {
                 event.setCancelled(true);
                     if (event.getWhoClicked().getItemOnCursor() != null && event.getWhoClicked().getItemOnCursor().getType() != Material.AIR)
                         event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), event.getWhoClicked().getItemOnCursor());

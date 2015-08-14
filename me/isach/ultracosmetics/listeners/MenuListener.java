@@ -275,7 +275,7 @@ public class MenuListener implements Listener {
             CustomPlayer cp = Core.getCustomPlayer(p);
             if (cp.currentGadget != null && cp.currentGadget.getType() == g.getType())
                 toggle = MessageManager.getMessage("Menu.Deactivate");
-            ItemStack is = ItemFactory.create(g.getMaterial(), g.getData(), toggle + " " + g.getName());
+            ItemStack is = ItemFactory.create(g.getMaterial(), g.getData(), toggle + " " + g.getConfigName());
             if (cp.currentGadget != null && cp.currentGadget.getType() == g.getType())
                 is.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 10);
             inv.setItem(i, is);
@@ -301,7 +301,7 @@ public class MenuListener implements Listener {
 
     public Gadget.GadgetType getGadgetByName(String name) {
         for (Gadget g : Core.gadgetList) {
-            if (g.getName().equals(name)) {
+            if (g.getConfigName().equals(name)) {
                 return g.getType();
             }
         }

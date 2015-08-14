@@ -3,7 +3,9 @@ package me.isach.ultracosmetics.cosmetics.gadgets;
 import me.isach.ultracosmetics.Core;
 import me.isach.ultracosmetics.config.MessageManager;
 import me.isach.ultracosmetics.util.ItemFactory;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.EntityEffect;
+import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -11,6 +13,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -66,16 +69,17 @@ public class GadgetFleshHook extends Gadget implements Listener {
     }
 
     @Override
-    void onInteractLeftClick() { }
+    void onInteractLeftClick() {
+    }
 
     @Override
     void onUpdate() {
-        for(Item i : items) {
-            i.getWorld().spigot().playEffect(i.getLocation(), Effect.CRIT, 0, 0, 0, 0, 0, 0, 1, 32);
-            i.getWorld().playSound(i.getLocation(), Sound.CLICK, .4f, 1);
-            if (i.isOnGround()) {
-                items.remove(i);
-                i.remove();
+        Iterator it = items.iterator();
+        while (it.hasNext()) {
+            Object pair = it.next();
+            if (((Item) pair).isOnGround()) {
+                ((Item) pair).remove();
+                it.remove();
             }
         }
     }

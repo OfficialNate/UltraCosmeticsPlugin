@@ -141,11 +141,13 @@ public class Core extends JavaPlugin {
                     while (iter.hasNext()) {
                         Entity ent = iter.next();
                         if (ent.isOnGround())
-                            noFallDamageEntities.remove(ent);
+                            iter.remove();
                     }
-                    for (Iterator<CustomPlayer> iterCustomPlayer = customPlayers.iterator(); iter.hasNext(); ) {
-                        if (iterCustomPlayer.next().getPlayer() == null)
-                            customPlayers.remove(iter.next());
+                    Iterator<CustomPlayer> customPlayerIterator = customPlayers.iterator();
+                    while(iter.hasNext()) {
+                        CustomPlayer customPlayer = customPlayerIterator.next();
+                        if(customPlayer.getPlayer() == null)
+                            customPlayerIterator.remove();
                     }
                     for (Player p : countdownMap.keySet()) {
                         if (countdownMap.get(p) != null) {
