@@ -19,7 +19,7 @@ import java.util.UUID;
 public class GadgetAntiGravity extends Gadget {
 
     public GadgetAntiGravity(UUID owner) {
-        super(Material.EYE_OF_ENDER, (byte) 0x0, MessageManager.getMessage("Gadgets.AntiGravity.name"), "ultracosmetics.gadgets.antigravity", 30, owner, GadgetType.ANTIGRAVITY);
+        super(Material.EYE_OF_ENDER, (byte) 0x0, "AntiGravity", "ultracosmetics.gadgets.antigravity", 30, owner, GadgetType.ANTIGRAVITY);
     }
 
     @Override

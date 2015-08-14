@@ -54,6 +54,8 @@ public abstract class Pet implements Listener {
                 getPlayer().sendMessage(MessageManager.getMessage("No-Permission"));
                 return;
             }
+            if(Core.getCustomPlayer(getPlayer()).currentPet != null)
+                Core.getCustomPlayer(getPlayer()).removePet();
             BukkitRunnable runnable = new BukkitRunnable() {
                 @Override
                 public void run() {

@@ -31,7 +31,7 @@ public class GadgetMelonThrower extends Gadget implements Listener {
     ArrayList<Item> melonBlocks = new ArrayList<>();
 
     public GadgetMelonThrower(UUID owner) {
-        super(Material.MELON, (byte) 0x0, MessageManager.getMessage("Gadgets.MelonThrower.name"), "ultracosmetics.gadgets.melonthrower", 1.5f, owner, GadgetType.MELONTHROWER);
+        super(Material.MELON, (byte) 0x0, "MelonThrower", "ultracosmetics.gadgets.melonthrower", 1.5f, owner, GadgetType.MELONTHROWER);
         Core.registerListener(this);
     }
 

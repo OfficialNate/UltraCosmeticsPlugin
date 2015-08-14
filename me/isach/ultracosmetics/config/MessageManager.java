@@ -22,6 +22,12 @@ public class MessageManager {
     private void loadMessages() {
         addMessage("Prefix", "&l&oCosmetics >&r");
         addMessage("No-Permission", "%prefix% &c&lYou don't have the permission!");
+        addMessage("Cosmetic-Disabled", "%prefix% &c&lThis cosmetic is disabled!");
+        addMessage("Invalid-Gadget", "%prefix% &c&lInvalid Gadget!");
+        addMessage("Invalid-Pet", "%prefix% &c&lInvalid Pet!");
+        addMessage("Invalid-Mount", "%prefix% &c&lInvalid Mount!");
+        addMessage("Invalid-Effect", "%prefix% &c&lInvalid Effect!");
+        addMessage("Invalid-Menu", "%prefix% &c&lInvalid Menu!");
 
         // Gadgets
         addMessage("Gadgets.Equip", "%prefix% &9You equipped %gadgetname%");

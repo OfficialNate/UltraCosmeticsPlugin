@@ -41,7 +41,7 @@ public class CustomPlayer {
 
     public void removeGadget() {
         if (currentGadget != null) {
-            getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Unequip").replaceAll("%gadgetname%", currentGadget.getConfigName()));
+            getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Unequip").replaceAll("%gadgetname%", currentGadget.getName()));
             currentGadget.clear();
             currentGadget.removeItem();
             currentGadget = null;
@@ -63,6 +63,13 @@ public class CustomPlayer {
             currentPet.clear();
             currentPet = null;
         }
+    }
+
+    public void clear() {
+        removeGadget();
+        removeParticleEffect();
+        removePet();
+        removeMount();
     }
 
     public void removeParticleEffect() {

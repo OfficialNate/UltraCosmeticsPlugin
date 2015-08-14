@@ -28,8 +28,9 @@ public class GadgetPortalGun extends Gadget {
     BlockFace loc2BlockFace;
 
     public GadgetPortalGun(UUID owner) {
-        super(Material.REDSTONE_COMPARATOR, (byte) 0x0, MessageManager.getMessage("Gadgets.PortalGun.name"), "ultracosmetics.gadgets.portalgun", 1, owner, GadgetType.PORTALGUN);
+        super(Material.REDSTONE_COMPARATOR, (byte) 0x0, "PortalGun", "ultracosmetics.gadgets.portalgun", 1, owner, GadgetType.PORTALGUN);
         displayCountdownMessage = false;
+        useTwoInteractMethods = true;
     }
 
     @Override

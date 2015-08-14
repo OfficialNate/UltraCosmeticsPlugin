@@ -9,6 +9,7 @@ import me.isach.ultracosmetics.cosmetics.mounts.*;
 import me.isach.ultracosmetics.cosmetics.particleeffects.*;
 import me.isach.ultracosmetics.cosmetics.pets.*;
 import me.isach.ultracosmetics.util.ItemFactory;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -91,12 +92,43 @@ public class MenuListener implements Listener {
 
         int i = 19;
         for (Pet pet : Core.petList) {
+            if (!pet.getType().isEnabled() && (boolean) SettingsManager.getConfig().get("Disabled-Items.Show-Custom-Disabled-Item")) {
+                Material material = Material.valueOf((String) SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Type"));
+                Byte data = Byte.valueOf(String.valueOf(SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Data")));
+                String name = String.valueOf(SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Name")).replaceAll("&", "§");
+                inv.setItem(i, ItemFactory.create(material, data, name));
+                if (i == 25 || i == 34) {
+                    i += 3;
+                } else {
+                    i++;
+                }
+                continue;
+            }
             if (!pet.getType().isEnabled()) continue;
+            if (SettingsManager.getConfig().get("No-Permission.Dont-Show-Item"))
+                if (!p.hasPermission(pet.getType().getPermission()))
+                    continue;
+            if ((boolean) SettingsManager.getConfig().get("No-Permission.Custom-Item.enabled") && !p.hasPermission(pet.getType().getPermission())) {
+                Material material = Material.valueOf((String) SettingsManager.getConfig().get("No-Permission.Custom-Item.Type"));
+                Byte data = Byte.valueOf(String.valueOf(SettingsManager.getConfig().get("No-Permission.Custom-Item.Data")));
+                String name = String.valueOf(SettingsManager.getConfig().get("No-Permission.Custom-Item.Name")).replaceAll("&", "§");
+                inv.setItem(i, ItemFactory.create(material, data, name));
+                if (i == 25 || i == 34) {
+                    i += 3;
+                } else {
+                    i++;
+                }
+                continue;
+            }
+            String lore = null;
+            if (SettingsManager.getConfig().get("No-Permission.Show-In-Lore")) {
+                lore = ChatColor.translateAlternateColorCodes('&', String.valueOf(SettingsManager.getConfig().get("No-Permission.Lore-Message-" + ((p.hasPermission(pet.getType().getPermission()) ? "Yes" : "No")))));
+            }
             String toggle = MessageManager.getMessage("Menu.Spawn");
             CustomPlayer cp = Core.getCustomPlayer(p);
             if (cp.currentPet != null && cp.currentPet.getType() == pet.getType())
                 toggle = MessageManager.getMessage("Menu.Despawn");
-            ItemStack is = ItemFactory.create(pet.getMaterial(), pet.getData(), toggle + " " + pet.getMenuName());
+            ItemStack is = ItemFactory.create(pet.getMaterial(), pet.getData(), toggle + " " + pet.getMenuName(), (lore != null) ? lore : null);
             if (cp.currentPet != null && cp.currentPet.getType() == pet.getType())
                 is.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 10);
             inv.setItem(i, is);
@@ -146,12 +178,43 @@ public class MenuListener implements Listener {
 
         int i = 19;
         for (ParticleEffect particleEffect : Core.particleEffectList) {
+            if (!particleEffect.getType().isEnabled() && (boolean) SettingsManager.getConfig().get("Disabled-Items.Show-Custom-Disabled-Item")) {
+                Material material = Material.valueOf((String) SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Type"));
+                Byte data = Byte.valueOf(String.valueOf(SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Data")));
+                String name = String.valueOf(SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Name")).replaceAll("&", "§");
+                inv.setItem(i, ItemFactory.create(material, data, name));
+                if (i == 25 || i == 34) {
+                    i += 3;
+                } else {
+                    i++;
+                }
+                continue;
+            }
             if (!particleEffect.getType().isEnabled()) continue;
+            if (SettingsManager.getConfig().get("No-Permission.Dont-Show-Item"))
+                if (!p.hasPermission(particleEffect.getType().getPermission()))
+                    continue;
+            if ((boolean) SettingsManager.getConfig().get("No-Permission.Custom-Item.enabled") && !p.hasPermission(particleEffect.getType().getPermission())) {
+                Material material = Material.valueOf((String) SettingsManager.getConfig().get("No-Permission.Custom-Item.Type"));
+                Byte data = Byte.valueOf(String.valueOf(SettingsManager.getConfig().get("No-Permission.Custom-Item.Data")));
+                String name = String.valueOf(SettingsManager.getConfig().get("No-Permission.Custom-Item.Name")).replaceAll("&", "§");
+                inv.setItem(i, ItemFactory.create(material, data, name));
+                if (i == 25 || i == 34) {
+                    i += 3;
+                } else {
+                    i++;
+                }
+                continue;
+            }
+            String lore = null;
+            if (SettingsManager.getConfig().get("No-Permission.Show-In-Lore")) {
+                lore = ChatColor.translateAlternateColorCodes('&', String.valueOf(SettingsManager.getConfig().get("No-Permission.Lore-Message-" + ((p.hasPermission(particleEffect.getType().getPermission()) ? "Yes" : "No")))));
+            }
             String toggle = MessageManager.getMessage("Menu.Summon");
             CustomPlayer cp = Core.getCustomPlayer(p);
             if (cp.currentParticleEffect != null && cp.currentParticleEffect.getType() == particleEffect.getType())
                 toggle = MessageManager.getMessage("Menu.Unsummon");
-            ItemStack is = ItemFactory.create(particleEffect.getMaterial(), particleEffect.getData(), toggle + " " + particleEffect.getName());
+            ItemStack is = ItemFactory.create(particleEffect.getMaterial(), particleEffect.getData(), toggle + " " + particleEffect.getName(), (lore != null) ? lore : null);
             if (cp.currentParticleEffect != null && cp.currentParticleEffect.getType() == particleEffect.getType())
                 is.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 10);
             inv.setItem(i, is);
@@ -215,12 +278,43 @@ public class MenuListener implements Listener {
 
         int i = 19;
         for (Mount m : Core.mountList) {
+            if (!m.getType().isEnabled() && (boolean) SettingsManager.getConfig().get("Disabled-Items.Show-Custom-Disabled-Item")) {
+                Material material = Material.valueOf((String) SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Type"));
+                Byte data = Byte.valueOf(String.valueOf(SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Data")));
+                String name = String.valueOf(SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Name")).replaceAll("&", "§");
+                inv.setItem(i, ItemFactory.create(material, data, name));
+                if (i == 25 || i == 34) {
+                    i += 3;
+                } else {
+                    i++;
+                }
+                continue;
+            }
             if (!m.getType().isEnabled()) continue;
+            if (SettingsManager.getConfig().get("No-Permission.Dont-Show-Item"))
+                if (!p.hasPermission(m.getType().getPermission()))
+                    continue;
+            if ((boolean) SettingsManager.getConfig().get("No-Permission.Custom-Item.enabled") && !p.hasPermission(m.getType().getPermission())) {
+                Material material = Material.valueOf((String) SettingsManager.getConfig().get("No-Permission.Custom-Item.Type"));
+                Byte data = Byte.valueOf(String.valueOf(SettingsManager.getConfig().get("No-Permission.Custom-Item.Data")));
+                String name = String.valueOf(SettingsManager.getConfig().get("No-Permission.Custom-Item.Name")).replaceAll("&", "§");
+                inv.setItem(i, ItemFactory.create(material, data, name));
+                if (i == 25 || i == 34) {
+                    i += 3;
+                } else {
+                    i++;
+                }
+                continue;
+            }
+            String lore = null;
+            if (SettingsManager.getConfig().get("No-Permission.Show-In-Lore")) {
+                lore = ChatColor.translateAlternateColorCodes('&', String.valueOf(SettingsManager.getConfig().get("No-Permission.Lore-Message-" + ((p.hasPermission(m.getType().getPermission()) ? "Yes" : "No")))));
+            }
             String toggle = MessageManager.getMessage("Menu.Spawn");
             CustomPlayer cp = Core.getCustomPlayer(p);
             if (cp.currentMount != null && cp.currentMount.getType() == m.getType())
                 toggle = MessageManager.getMessage("Menu.Despawn");
-            ItemStack is = ItemFactory.create(m.getMaterial(), m.getData(), toggle + " " + m.getMenuName());
+            ItemStack is = ItemFactory.create(m.getMaterial(), m.getData(), toggle + " " + m.getMenuName(), (lore != null) ? lore : null);
             if (cp.currentMount != null && cp.currentMount.getType() == m.getType())
                 is.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 10);
             inv.setItem(i, is);
@@ -270,12 +364,44 @@ public class MenuListener implements Listener {
 
         int i = 19;
         for (Gadget g : Core.gadgetList) {
+            if (!g.getType().isEnabled() && (boolean) SettingsManager.getConfig().get("Disabled-Items.Show-Custom-Disabled-Item")) {
+                Material material = Material.valueOf((String) SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Type"));
+                Byte data = Byte.valueOf(String.valueOf(SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Data")));
+                String name = String.valueOf(SettingsManager.getConfig().get("Disabled-Items.Custom-Disabled-Item.Name")).replaceAll("&", "§");
+                inv.setItem(i, ItemFactory.create(material, data, name));
+                if (i == 25 || i == 34) {
+                    i += 3;
+                } else {
+                    i++;
+                }
+                continue;
+            }
             if (!g.getType().isEnabled()) continue;
+            if (SettingsManager.getConfig().get("No-Permission.Dont-Show-Item"))
+                if (!p.hasPermission(g.getType().getPermission()))
+                    continue;
+            if ((boolean) SettingsManager.getConfig().get("No-Permission.Custom-Item.enabled") && !p.hasPermission(g.getType().getPermission())) {
+                Material material = Material.valueOf((String) SettingsManager.getConfig().get("No-Permission.Custom-Item.Type"));
+                Byte data = Byte.valueOf(String.valueOf(SettingsManager.getConfig().get("No-Permission.Custom-Item.Data")));
+                String name = String.valueOf(SettingsManager.getConfig().get("No-Permission.Custom-Item.Name")).replaceAll("&", "§");
+                inv.setItem(i, ItemFactory.create(material, data, name));
+                if (i == 25 || i == 34) {
+                    i += 3;
+                } else {
+                    i++;
+                }
+                continue;
+            }
+
+            String lore = null;
+            if ((boolean)SettingsManager.getConfig().get("No-Permission.Show-In-Lore")) {
+                lore = ChatColor.translateAlternateColorCodes('&', String.valueOf(SettingsManager.getConfig().get("No-Permission.Lore-Message-" + ((p.hasPermission(g.getType().getPermission()) ? "Yes" : "No")))));
+            }
             String toggle = MessageManager.getMessage("Menu.Activate");
             CustomPlayer cp = Core.getCustomPlayer(p);
             if (cp.currentGadget != null && cp.currentGadget.getType() == g.getType())
                 toggle = MessageManager.getMessage("Menu.Deactivate");
-            ItemStack is = ItemFactory.create(g.getMaterial(), g.getData(), toggle + " " + g.getConfigName());
+            ItemStack is = ItemFactory.create(g.getMaterial(), g.getData(), toggle + " " + g.getName(), (lore != null) ? lore : null);
             if (cp.currentGadget != null && cp.currentGadget.getType() == g.getType())
                 is.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 10);
             inv.setItem(i, is);
@@ -290,7 +416,7 @@ public class MenuListener implements Listener {
         Core.getCustomPlayer(p).currentMenu = CustomPlayer.MenuCategory.GADGETS;
     }
 
-    public Mount.MountType getMountByName(String name) {
+    public static Mount.MountType getMountByName(String name) {
         for (Mount mount : Core.mountList) {
             if (mount.getMenuName().equals(name)) {
                 return mount.getType();
@@ -299,18 +425,18 @@ public class MenuListener implements Listener {
         return null;
     }
 
-    public Gadget.GadgetType getGadgetByName(String name) {
+    public static Gadget.GadgetType getGadgetByName(String name) {
         for (Gadget g : Core.gadgetList) {
-            if (g.getConfigName().equals(name)) {
+            if (g.getName().equals(name)) {
                 return g.getType();
             }
         }
         return null;
     }
 
-    List<Player> playerList = new ArrayList<>();
+    static List<Player> playerList = new ArrayList<>();
 
-    public void activateMountByType(Mount.MountType type, final Player player) {
+    public static void activateMountByType(Mount.MountType type, final Player player) {
         if (!player.hasPermission(type.getPermission())) {
             if (!playerList.contains(player)) {
                 player.sendMessage(MessageManager.getMessage("No-Permission"));
@@ -353,7 +479,7 @@ public class MenuListener implements Listener {
         }
     }
 
-    public Pet.PetType getPetByName(String name) {
+    public static Pet.PetType getPetByName(String name) {
         for (Pet pet : Core.petList) {
             if (pet.getMenuName().equals(name)) {
                 return pet.getType();
@@ -362,7 +488,7 @@ public class MenuListener implements Listener {
         return null;
     }
 
-    public void activatePetByType(Pet.PetType type, final Player player) {
+    public static void activatePetByType(Pet.PetType type, final Player player) {
         if (!player.hasPermission(type.getPermission())) {
             if (!playerList.contains(player)) {
                 player.sendMessage(MessageManager.getMessage("No-Permission"));
@@ -402,7 +528,7 @@ public class MenuListener implements Listener {
         }
     }
 
-    public ParticleEffect.ParticleEffectType getParticleEffectByName(String name) {
+    public static ParticleEffect.ParticleEffectType getParticleEffectByName(String name) {
         for (ParticleEffect particleEffect : Core.particleEffectList) {
             if (particleEffect.getName().equals(name)) {
                 return particleEffect.getType();
@@ -411,7 +537,7 @@ public class MenuListener implements Listener {
         return null;
     }
 
-    public void activateParticleEffectByType(ParticleEffect.ParticleEffectType type, final Player player) {
+    public static void activateParticleEffectByType(ParticleEffect.ParticleEffectType type, final Player player) {
         if (!player.hasPermission(type.getPermission())) {
             if (!playerList.contains(player)) {
                 player.sendMessage(MessageManager.getMessage("No-Permission"));
@@ -442,9 +568,6 @@ public class MenuListener implements Listener {
             case FROSTLORD:
                 new ParticleEffectFrostLord(player.getUniqueId());
                 break;
-            case ANGELWINGS:
-                new ParticleEffectAngelWings(player.getUniqueId());
-                break;
             case GREENSPARKS:
                 new ParticleEffectGreenSparks(player.getUniqueId());
                 break;
@@ -454,7 +577,7 @@ public class MenuListener implements Listener {
         }
     }
 
-    public void activateGadgetByType(Gadget.GadgetType type, final Player player) {
+    public static void activateGadgetByType(Gadget.GadgetType type, final Player player) {
         if (!player.hasPermission(type.getPermission())) {
             if (!playerList.contains(player)) {
                 player.sendMessage(MessageManager.getMessage("No-Permission"));
@@ -511,9 +634,9 @@ public class MenuListener implements Listener {
             case ANTIGRAVITY:
                 new GadgetAntiGravity(player.getUniqueId());
                 break;
-            case TSUNAMI:
+            /*case TSUNAMI:
                 new GadgetTsunami(player.getUniqueId());
-                break;
+                break;*/
         }
     }
 

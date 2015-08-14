@@ -30,7 +30,7 @@ public class GadgetEtherealPearl extends Gadget implements Listener {
     ArrayList<EnderPearl> pearls = new ArrayList<>();
 
     public GadgetEtherealPearl(UUID owner) {
-        super(Material.ENDER_PEARL, (byte) 0x0, MessageManager.getMessage("Gadgets.EtherealPearl.name"), "ultracosmetics.gadgets.etherealpearl", 3, owner, GadgetType.ETHEREALPEARL);
+        super(Material.ENDER_PEARL, (byte) 0x0, "EtherealPearl", "ultracosmetics.gadgets.etherealpearl", 3, owner, GadgetType.ETHEREALPEARL);
         Core.registerListener(this);
     }
 
@@ -134,7 +134,7 @@ public class GadgetEtherealPearl extends Gadget implements Listener {
                 // && event.getEntity().getPassenger() == getPlayer()
                 if (runnableHashMap.containsKey(event.getEntity().getPassenger())) {
                     Bukkit.broadcastMessage("c");
-                    if (((Player) event.getEntity().getPassenger()).getConfigName().equals(getPlayer().getConfigName())){
+                    if (((Player) event.getEntity().getPassenger()).getName().equals(getPlayer().getName())){
                         Bukkit.broadcastMessage("d");
                         getPlayer().eject();
                         runnableHashMap.remove( event.getEntity().getPassenger());

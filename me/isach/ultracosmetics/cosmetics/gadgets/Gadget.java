@@ -26,12 +26,13 @@ import java.util.UUID;
  */
 public abstract class Gadget implements Listener {
 
+    public boolean useTwoInteractMethods;
     private Material material;
     private Byte data;
     private String configName;
     private double countdown;
 
-    private GadgetType type = GadgetType.DEFAULT;
+    private GadgetType type;
 
     public boolean displayCountdownMessage = true;
 
@@ -46,8 +47,11 @@ public abstract class Gadget implements Listener {
         this.permission = permission;
         this.countdown = countdown;
         this.type = type;
+        this.useTwoInteractMethods = false;
         if (owner != null) {
             this.owner = owner;
+            if(Core.getCustomPlayer(getPlayer()).currentGadget != null)
+                Core.getCustomPlayer(getPlayer()).removeGadget();
             if (!getPlayer().hasPermission(permission)) {
                 getPlayer().sendMessage(MessageManager.getMessage("No-Permission"));
                 return;
@@ -70,14 +74,14 @@ public abstract class Gadget implements Listener {
                 getPlayer().getWorld().dropItem(getPlayer().getLocation(), getPlayer().getInventory().getItem((int) SettingsManager.getConfig().get("Gadget-Slot")));
                 getPlayer().getInventory().remove((int) SettingsManager.getConfig().get("Gadget-Slot"));
             }
-            getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), ItemFactory.create(material, data, getConfigName(), "§9Gadget"));
-            getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Equip").replaceAll("%gadgetname%", getConfigName()));
+            getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), ItemFactory.create(material, data, getName(), "§9Gadget"));
+            getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Equip").replaceAll("%gadgetname%", getName()));
             Core.getCustomPlayer(getPlayer()).currentGadget = this;
         }
     }
 
-    public String getConfigName() {
-        return MessageManager.getMessage("Gadgets." + configName + ".configName");
+    public String getName() {
+        return MessageManager.getMessage("Gadgets." + configName + ".name");
     }
 
     public Material getMaterial() {
@@ -169,12 +173,16 @@ public abstract class Gadget implements Listener {
                 countdownMap.put(getType(), countdown);
                 Core.countdownMap.put(getPlayer(), countdownMap);
             }
-            if (event.getAction() == Action.RIGHT_CLICK_AIR
-                    || event.getAction() == Action.RIGHT_CLICK_BLOCK)
+            if(useTwoInteractMethods) {
+                if (event.getAction() == Action.RIGHT_CLICK_AIR
+                        || event.getAction() == Action.RIGHT_CLICK_BLOCK)
+                    onInteractRightClick();
+                else if (event.getAction() == Action.LEFT_CLICK_BLOCK
+                        || event.getAction() == Action.LEFT_CLICK_AIR)
+                    onInteractLeftClick();
+            } else {
                 onInteractRightClick();
-            else if (event.getAction() == Action.LEFT_CLICK_BLOCK
-                    || event.getAction() == Action.LEFT_CLICK_AIR)
-                onInteractLeftClick();
+            }
 
         }
 
@@ -202,7 +210,6 @@ public abstract class Gadget implements Listener {
     }
 
     public enum GadgetType {
-        DEFAULT("", ""),
         BATBLASTER("ultracosmetics.gadgets.batblaster", "BatBlaster"),
         CHICKENATOR("ultracosmetics.gadgets.chickenator", "Chickenator"),
         COLORBOMB("ultracosmetics.gadgets.colorbomb", "ColorBomb"),
@@ -216,8 +223,8 @@ public abstract class Gadget implements Listener {
         PAINTBALLGUN("ultracosmetics.gadgets.paintballgun", "PaintballGun"),
         THORHAMMER("ultracosmetics.gadgets.thorhammer", "ThorHammer"),
         ANTIGRAVITY("ultracosmetics.gadgets.antigravity", "AntiGravity"),
-        SMASHDOWN("ultracosmetics.gadgets.smashdown", "SmashDown"),
-        TSUNAMI("ultracosmetics.gadgets.tsunami", "Tsunami");
+        SMASHDOWN("ultracosmetics.gadgets.smashdown", "SmashDown");
+        //TSUNAMI("ultracosmetics.gadgets.tsunami", "Tsunami");
 
         String permission;
         public String configName;

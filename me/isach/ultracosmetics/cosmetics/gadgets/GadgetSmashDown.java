@@ -30,7 +30,7 @@ public class GadgetSmashDown extends Gadget {
     List<FallingBlock> fallingBlocks = new ArrayList<>();
 
     public GadgetSmashDown(UUID owner) {
-        super(Material.FIREWORK_CHARGE, (byte) 0x0, MessageManager.getMessage("Gadgets.SmashDown.name"), "ultracosmetics.gadgets.smashdown", 15, owner, GadgetType.SMASHDOWN);
+        super(Material.FIREWORK_CHARGE, (byte) 0x0, "SmashDown", "ultracosmetics.gadgets.smashdown", 15, owner, GadgetType.SMASHDOWN);
         Core.registerListener(this);
     }
 
@@ -56,22 +56,6 @@ public class GadgetSmashDown extends Gadget {
 
     @Override
     void onInteractLeftClick() {
-        getPlayer().playSound(getPlayer().getLocation(), Sound.FIREWORK_LAUNCH, 2, 1);
-        getPlayer().setVelocity(new Vector(0, 3, 0));
-        final int taskId = Bukkit.getScheduler().runTaskTimer(Core.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-                UtilParticles.play(getPlayer().getLocation(), Effect.CLOUD);
-            }
-        }, 0, 1).getTaskId();
-        Bukkit.getScheduler().runTaskLater(Core.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-                Bukkit.getScheduler().cancelTask(taskId);
-                getPlayer().setVelocity(new Vector(0, -3, 0));
-                activePlayers.add(getPlayer());
-            }
-        }, 25);
     }
 
     @EventHandler

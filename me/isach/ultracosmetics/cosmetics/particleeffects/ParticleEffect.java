@@ -50,6 +50,8 @@ public abstract class ParticleEffect implements Listener {
                 getPlayer().sendMessage(MessageManager.getMessage("No-Permission"));
                 return;
             }
+            if(Core.getCustomPlayer(getPlayer()).currentParticleEffect != null)
+                Core.getCustomPlayer(getPlayer()).removeParticleEffect();
             BukkitRunnable runnable = new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -143,7 +145,6 @@ public abstract class ParticleEffect implements Listener {
         BLOODHELIX("ultracosmetics.particleeffects.bloodhelix", "BloodHelix"),
         FROSTLORD("ultracosmetics.particleeffects.frostlord", "FrostLord"),
         FLAMERINGS("ultracosmetics.particleeffects.flamerings", "FlameRings"),
-        ANGELWINGS("ultracosmetics.particleeffects.angelwings", "AngelWings"),
         INLOVE("ultracosmetics.particleeffects.inlove", "InLove"),
         GREENSPARKS("ultracosmetics.particleeffects.greensparks", "GreenSparks");
 

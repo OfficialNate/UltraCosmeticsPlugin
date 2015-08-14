@@ -1,5 +1,7 @@
 package me.isach.ultracosmetics;
 
+import me.isach.ultracosmetics.commands.UltraCosmeticsCommand;
+import me.isach.ultracosmetics.commands.UltraCosmeticsTabCompleter;
 import me.isach.ultracosmetics.config.MessageManager;
 import me.isach.ultracosmetics.config.SettingsManager;
 import me.isach.ultracosmetics.cosmetics.gadgets.*;
@@ -100,6 +102,12 @@ public class Core extends JavaPlugin {
         petList.add(new PetCow(null));
         petList.add(new PetEasterBunny(null));
 
+        // Register the command
+        getCommand("ultracosmetics").setExecutor(new UltraCosmeticsCommand());
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("uc");
+        getCommand("ultracosmetics").setAliases(arrayList);
+        getCommand("ultracosmetics").setTabCompleter(new UltraCosmeticsTabCompleter());
 
         // Set config things.
         SettingsManager.getConfig().addDefault("Menu-Item.Give-On-Join", true);
@@ -107,6 +115,18 @@ public class Core extends JavaPlugin {
         SettingsManager.getConfig().addDefault("Menu-Item.Type", "ENDER_CHEST");
         SettingsManager.getConfig().addDefault("Menu-Item.Data", 0);
         SettingsManager.getConfig().addDefault("Menu-Item.Displayname", "&6&lCosmetics");
+        SettingsManager.getConfig().addDefault("No-Permission.Show-In-Lore", true);
+        SettingsManager.getConfig().addDefault("No-Permission.Lore-Message-Yes", "&o&7Permission: &a&lYes!");
+        SettingsManager.getConfig().addDefault("No-Permission.Lore-Message-No", "&o&7Permission: &4&lNo!");
+        SettingsManager.getConfig().addDefault("No-Permission.Dont-Show-Item", false);
+        SettingsManager.getConfig().addDefault("No-Permission.Custom-Item.enabled", false);
+        SettingsManager.getConfig().addDefault("No-Permission.Custom-Item.Type", "INK_SACK");
+        SettingsManager.getConfig().addDefault("No-Permission.Custom-Item.Data", 8);
+        SettingsManager.getConfig().addDefault("No-Permission.Custom-Item.Name", "&c&lNo Permission");
+        SettingsManager.getConfig().addDefault("Disabled-Items.Show-Custom-Disabled-Item", false);
+        SettingsManager.getConfig().addDefault("Disabled-Items.Custom-Disabled-Item.Type", "INK_SACK");
+        SettingsManager.getConfig().addDefault("Disabled-Items.Custom-Disabled-Item.Data", 8);
+        SettingsManager.getConfig().addDefault("Disabled-Items.Custom-Disabled-Item.Name", "&c&lDisabled");
 
         SettingsManager.getConfig().addDefault("Gadget-Slot", 4);
 
@@ -158,12 +178,6 @@ public class Core extends JavaPlugin {
                                     countdownMap.get(p).put(gt, timeLeft);
                                 }
                             }
-                            /*for (Iterator<Gadget.GadgetType> iterGadgets = countdownMap.get(p).entrySet().iterator(); iter.hasNext(); ) {
-                                Gadget.GadgetType pt = iterGadgets.next();
-                                if (countdownMap.get(p).get(pt) < 0.1) {
-                                    countdownMap.get(p).remove(pt);
-                                }
-                            }*/
                             Iterator it = countdownMap.get(p).entrySet().iterator();
                             while (it.hasNext()) {
                                 Map.Entry pair = (Map.Entry) it.next();

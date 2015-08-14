@@ -119,6 +119,9 @@ public class BlockUtils {
                 && b.getType() != Material.STATIONARY_WATER
                 && b.getType() != Material.LAVA
                 && b.getType() != Material.STATIONARY_LAVA
+                && b.getType() != Material.PORTAL
+                && b.getType() != Material.ENDER_PORTAL
+                && b.getType() != Material.SOIL
                 && net.minecraft.server.v1_8_R3.Block.getById(b.getTypeId()).getMaterial().isSolid()
                 && bUp.getType() != Material.CROPS
                 && bUp.getType() != Material.GRASS

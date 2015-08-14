@@ -1,5 +1,9 @@
 name: UltraCosmetics
 author: iSach
-version: Beta 1.0.4
+version: Beta 1.0.7
 main: me.isach.ultracosmetics.Core
 softdepend: [NoteBlockAPI]
+commands:
+  ultracosmetics:
+    aliases: [uc, cosmetics]
+    description: Main Command of Ultra Cosmetics

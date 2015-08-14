@@ -25,7 +25,7 @@ public class GadgetThorHammer extends Gadget implements Listener {
     Vector v;
 
     public GadgetThorHammer(UUID owner) {
-        super(Material.IRON_AXE, (byte) 0x0, MessageManager.getMessage("Gadgets.ThorHammer.name"), "ultracosmetics.gadgets.thorhammer", 4, owner, GadgetType.THORHAMMER);
+        super(Material.IRON_AXE, (byte) 0x0, "ThorHammer", "ultracosmetics.gadgets.thorhammer", 4, owner, GadgetType.THORHAMMER);
         Core.registerListener(this);
     }
 

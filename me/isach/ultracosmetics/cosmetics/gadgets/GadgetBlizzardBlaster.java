@@ -29,7 +29,7 @@ public class GadgetBlizzardBlaster extends Gadget {
     List<ArmorStand> armorStands = new ArrayList<>();
 
     public GadgetBlizzardBlaster(UUID owner) {
-        super(Material.PACKED_ICE, (byte) 0x0, MessageManager.getMessage("Gadgets.BlizzardBlaster.name"), "ultracosmetics.gadgets.blizzardblaster", 5, owner, GadgetType.BLIZZARDBLASTER);
+        super(Material.PACKED_ICE, (byte) 0x0, "BlizzardBlaster", "ultracosmetics.gadgets.blizzardblaster", 5, owner, GadgetType.BLIZZARDBLASTER);
     }
 
     @Override

@@ -48,6 +48,8 @@ public abstract class Mount implements Listener {
                 getPlayer().sendMessage(MessageManager.getMessage("No-Permission"));
                 return;
             }
+            if(Core.getCustomPlayer(getPlayer()).currentMount != null)
+                Core.getCustomPlayer(getPlayer()).removeMount();
             BukkitRunnable runnable = new BukkitRunnable() {
                 @Override
                 public void run() {

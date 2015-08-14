@@ -24,7 +24,7 @@ public class GadgetFleshHook extends Gadget implements Listener {
     private ArrayList<Item> items = new ArrayList<>();
 
     public GadgetFleshHook(UUID owner) {
-        super(Material.TRIPWIRE_HOOK, (byte) 0x0, MessageManager.getMessage("Gadgets.FleshHook.name"), "ultracosmetics.gadgets.fleshhook", 2, owner, GadgetType.FLESHHOOK);
+        super(Material.TRIPWIRE_HOOK, (byte) 0x0, "FleshHook", "ultracosmetics.gadgets.fleshhook", 2, owner, GadgetType.FLESHHOOK);
         Core.registerListener(this);
     }
 

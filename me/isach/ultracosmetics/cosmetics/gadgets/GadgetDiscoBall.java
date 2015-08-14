@@ -4,7 +4,6 @@ import com.xxmicloxx.NoteBlockAPI.NBSDecoder;
 import com.xxmicloxx.NoteBlockAPI.PositionSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.Song;
 import me.isach.ultracosmetics.Core;
-import me.isach.ultracosmetics.config.MessageManager;
 import me.isach.ultracosmetics.util.BlockUtils;
 import me.isach.ultracosmetics.util.ItemFactory;
 import me.isach.ultracosmetics.util.MathUtils;
@@ -35,9 +34,10 @@ public class GadgetDiscoBall extends Gadget {
     double i2 = 0;
     ArmorStand armorStand;
     boolean running = false;
+    PositionSongPlayer positionSongPlayer;
 
     public GadgetDiscoBall(UUID owner) {
-        super(Material.BEACON, (byte) 0x0, MessageManager.getMessage("Gadgets.DiscoBall.name"), "ultracosmetics.gadgets.discoball", 60, owner, GadgetType.DISCOBALL);
+        super(Material.BEACON, (byte) 0x0, "DiscoBall", "ultracosmetics.gadgets.discoball", 60, owner, GadgetType.DISCOBALL);
     }
 
     @Override
@@ -50,6 +50,8 @@ public class GadgetDiscoBall extends Gadget {
             i = 0;
             i2 = 0;
             Core.discoBalls.remove(this);
+            if (Core.nbapiEnabled)
+                positionSongPlayer.setPlaying(false);
         } catch (Exception exc) {
         }
     }
@@ -65,7 +67,7 @@ public class GadgetDiscoBall extends Gadget {
         Core.discoBalls.add(this);
         if (Core.nbapiEnabled) {
             Song s = NBSDecoder.parse(new File(Core.getPlugin().getDataFolder().getPath() + "/songs/GetLucky.nbs"));
-            final PositionSongPlayer positionSongPlayer = new PositionSongPlayer(s);
+            positionSongPlayer = new PositionSongPlayer(s);
 
             positionSongPlayer.setTargetLocation(armorStand.getEyeLocation().add(-.5d, -.5d, -.5d));
 
@@ -96,7 +98,7 @@ public class GadgetDiscoBall extends Gadget {
     void onUpdate() {
         if (running) {
             armorStand.setHeadPose(armorStand.getHeadPose().add(0, 0.2, 0));
-            armorStand.setHelmet(ItemFactory.create(Material.STAINED_GLASS, (byte)r.nextInt(15), " "));
+            armorStand.setHelmet(ItemFactory.create(Material.STAINED_GLASS, (byte) r.nextInt(15), " "));
             armorStand.getWorld().spigot().playEffect(armorStand.getEyeLocation().add(-.5d, -.5d, -.5d).clone().add(0.5, 0.5, 0.5), Effect.SPELL, 0, 0, 0, 0, 0, 1f, 1, 64);
             armorStand.getWorld().spigot().playEffect(armorStand.getEyeLocation().add(-.5d, -.5d, -.5d).clone().add(0.5, 0.5, 0.5), Effect.INSTANT_SPELL, 0, 0, 0, 0, 0, 1f, 1, 64);
             armorStand.getWorld().spigot().playEffect(armorStand.getEyeLocation().add(-.5d, -.5d, -.5d).clone().add(0.5, 0.5, 0.5), Effect.NOTE, r.nextInt(15), r.nextInt(15), 4, 3, 4, 1f, 1, 64);

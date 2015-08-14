@@ -24,7 +24,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
         Core.customPlayers.add(new CustomPlayer(event.getPlayer().getUniqueId()));
-        if (SettingsManager.getConfig().get("Menu-Item.Give-On-Join")) {
+        if ((boolean)SettingsManager.getConfig().get("Menu-Item.Give-On-Join")) {
             Bukkit.getScheduler().runTaskLater(Core.getPlugin(), new Runnable() {
                 @Override
                 public void run() {
@@ -90,22 +90,6 @@ public class PlayerListener implements Listener {
                 && event.getEntity().getInventory().getItem(slot).getItemMeta().hasDisplayName()
                 && event.getEntity().getInventory().getItem(slot).getItemMeta().getDisplayName().equals(String.valueOf(SettingsManager.getConfig().get("Menu-Item.Displayname")).replaceAll("&", "§"))) {
             event.getEntity().getInventory().setItem(slot, null);
-        }
-    }
-
-    @EventHandler
-    public void onPreProcessCommand(PlayerCommandPreprocessEvent event) {
-        if(event.getMessage().equalsIgnoreCase("/uc menu")) {
-            event.setCancelled(true);
-            if (Core.getCustomPlayer(event.getPlayer()).currentMenu == CustomPlayer.MenuCategory.GADGETS) {
-                MenuListener.openGadgetsMenu(event.getPlayer());
-            } else if (Core.getCustomPlayer(event.getPlayer()).currentMenu == CustomPlayer.MenuCategory.PARTICLEEFFECTS) {
-                MenuListener.openParticlesMenu(event.getPlayer());
-            } else if (Core.getCustomPlayer(event.getPlayer()).currentMenu == CustomPlayer.MenuCategory.MOUNTS) {
-                MenuListener.openMountsMenu(event.getPlayer());
-            } else if (Core.getCustomPlayer(event.getPlayer()).currentMenu == CustomPlayer.MenuCategory.PETS) {
-                MenuListener.openPetsMenu(event.getPlayer());
-            }
         }
     }
 

@@ -22,7 +22,7 @@ public class GadgetBatBlaster extends Gadget {
     private HashMap<Player, ArrayList<Bat>> bats = new HashMap();
 
     public GadgetBatBlaster(UUID owner) {
-        super(Material.IRON_BARDING, (byte) 0x0, MessageManager.getMessage("Gadgets.BatBlaster.name"), "ultracosmetics.gadgets.batblaster", 7, owner, GadgetType.BATBLASTER);
+        super(Material.IRON_BARDING, (byte) 0x0, "BatBlaster", "ultracosmetics.gadgets.batblaster", 7, owner, GadgetType.BATBLASTER);
     }
 
     @Override

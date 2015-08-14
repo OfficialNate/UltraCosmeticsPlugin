@@ -10,6 +10,7 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftSheep;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Sheep;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -28,7 +29,7 @@ public class GadgetExplosiveSheep extends Gadget {
     ArrayList<Sheep> sheepArrayList = new ArrayList<>();
 
     public GadgetExplosiveSheep(UUID owner) {
-        super(Material.SHEARS, (byte) 0x0, MessageManager.getMessage("Gadgets.ExplosiveSheep.name"), "ultracosmetics.gadgets.explosivesheep", 40, owner, GadgetType.EXPLOSIVESHEEP);
+        super(Material.SHEARS, (byte) 0x0, "ExplosiveSheep", "ultracosmetics.gadgets.explosivesheep", 40, owner, GadgetType.EXPLOSIVESHEEP);
         Core.registerListener(this);
     }
 
@@ -68,6 +69,12 @@ public class GadgetExplosiveSheep extends Gadget {
 
     @EventHandler
     public void onShear(PlayerShearEntityEvent event) {
+        if(sheepArrayList.contains(event.getEntity()))
+            event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onShear(EntityDamageEvent event) {
         if(sheepArrayList.contains(event.getEntity()))
             event.setCancelled(true);
     }

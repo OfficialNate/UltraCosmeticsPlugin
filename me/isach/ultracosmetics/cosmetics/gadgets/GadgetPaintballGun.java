@@ -26,7 +26,7 @@ public class GadgetPaintballGun extends Gadget implements Listener {
     Map<UUID, ArrayList<Projectile>> projectiles = new HashMap();
 
     public GadgetPaintballGun(UUID owner) {
-        super(Material.DIAMOND_BARDING, (byte) 0x0, MessageManager.getMessage("Gadgets.PaintballGun.name"), "ultracosmetics.gadgets.paintballgun", 0.2f, owner, GadgetType.PAINTBALLGUN);
+        super(Material.DIAMOND_BARDING, (byte) 0x0, "PaintballGun", "ultracosmetics.gadgets.paintballgun", 0.2f, owner, GadgetType.PAINTBALLGUN);
         Core.registerListener(this);
         displayCountdownMessage = false;
     }
