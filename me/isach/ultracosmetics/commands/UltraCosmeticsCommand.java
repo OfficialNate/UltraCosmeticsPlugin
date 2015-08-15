@@ -3,6 +3,7 @@ package me.isach.ultracosmetics.commands;
 import me.isach.ultracosmetics.Core;
 import me.isach.ultracosmetics.CustomPlayer;
 import me.isach.ultracosmetics.config.MessageManager;
+import me.isach.ultracosmetics.config.SettingsManager;
 import me.isach.ultracosmetics.cosmetics.gadgets.Gadget;
 import me.isach.ultracosmetics.cosmetics.mounts.Mount;
 import me.isach.ultracosmetics.cosmetics.particleeffects.ParticleEffect;
@@ -117,6 +118,15 @@ public class UltraCosmeticsCommand implements CommandExecutor {
             } else if (argZero.equalsIgnoreCase("clear")) {
                 Core.getCustomPlayer((Player) sender).clear();
                 return true;
+            }  else if (argZero.equalsIgnoreCase("reload")) {
+                if(((Player)sender).hasPermission("ultracosmetics.reload")) {
+                    SettingsManager.getConfig().reload();
+                    SettingsManager.getMessages().reload();
+                    sender.sendMessage("§l§oCosmetics > §c§lConfig and messages Reloaded!");
+                } else {
+                    sender.sendMessage(MessageManager.getMessage("No-Permission"));
+                }
+                return true;
             } else if (argZero.equalsIgnoreCase("menu")) {
                 if (args.length == 1) {
                     if (Core.getCustomPlayer((Player) sender).currentMenu == CustomPlayer.MenuCategory.GADGETS) {
@@ -153,6 +163,7 @@ public class UltraCosmeticsCommand implements CommandExecutor {
     public String getHelp() {
         return "\n§r"
                 + "§b§lUltra Cosmetics  §8┃ §f§lUltra Cosmetics Help (/uc)" + "\n§r"
+                + "                         §8┃ §7/uc reload §f- Reloads the config" + "\n§r"
                 + "                         §8┃ §7/uc menu [menu] §f- Opens a menu" + "\n§r"
                 + "                         §8┃ §7/uc gadget <gadget> §f- Toggles a gadget" + "\n§r"
                 + "                         §8┃ §7/uc pet <pet> §f- Toggles a pet" + "\n§r"

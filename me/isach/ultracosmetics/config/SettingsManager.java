@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by sacha on 21/07/15.
@@ -75,6 +76,14 @@ public class SettingsManager {
      */
     public static SettingsManager getData(Player p) {
         return new SettingsManager("/data/" + p.getUniqueId().toString());
+    }
+
+    public void reload() {
+        try {
+            fileConfiguration = YamlConfiguration.loadConfiguration(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

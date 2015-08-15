@@ -748,7 +748,7 @@ public class MenuListener implements Listener {
 
     @EventHandler
     public void particleEffectSelection(InventoryClickEvent event) {
-        if (event.getInventory().getTitle().equals(MessageManager.getMessage("Menus.Particle-Effect"))) {
+        if (event.getInventory().getTitle().equals(MessageManager.getMessage("Menus.Particle-Effects"))) {
             event.setCancelled(true);
             if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()) return;
             if (event.getCurrentItem().getItemMeta().hasDisplayName()) {

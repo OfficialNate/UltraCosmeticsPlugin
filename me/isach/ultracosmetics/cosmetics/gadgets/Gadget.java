@@ -137,7 +137,7 @@ public abstract class Gadget implements Listener {
 
         Inventory inventory = Bukkit.createInventory(null, 54, "§lBuy Ammo");
 
-        inventory.setItem(13, ItemFactory.create(material, data, MessageManager.getMessage("Buy-Ammo-Description").replaceAll("%amount%", ""+getResultAmmoAmount()).replaceAll("%price%", "" + getPrice()).replaceAll("%gadgetname%", getName())));
+        inventory.setItem(13, ItemFactory.create(material, data, MessageManager.getMessage("Buy-Ammo-Description").replaceAll("%amount%", "" + getResultAmmoAmount()).replaceAll("%price%", "" + getPrice()).replaceAll("%gadgetname%", getName())));
 
         for (int i = 27; i < 30; i++) {
             inventory.setItem(i, ItemFactory.create(Material.STAINED_CLAY, (byte) 0xb, "§a§lPURCHASE"));
@@ -194,149 +194,150 @@ public abstract class Gadget implements Listener {
             }
         }
 
-    public boolean isSameInventory(Inventory first, Inventory second) {
-        return ((CraftInventory) first).getInventory().equals(((CraftInventory) second).getInventory());
-    }
+        public boolean isSameInventory(Inventory first, Inventory second) {
+            return ((CraftInventory) first).getInventory().equals(((CraftInventory) second).getInventory());
+        }
 
-    @EventHandler
-    protected void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-        if (!uuid.equals(gadget.owner)) return;
-        ItemStack itemStack = player.getItemInHand();
-        if (itemStack.getType() != gadget.material) return;
-        if (itemStack.getData().getData() != gadget.data) return;
-        if (player.getInventory().getHeldItemSlot() != (int) SettingsManager.getConfig().get("Gadget-Slot")) return;
-        if (Core.getCustomPlayer(getPlayer()).currentGadget != gadget) return;
-        event.setCancelled(true);
-        player.updateInventory();
-        if (Core.ammoEnabled) {
-            if (Core.getCustomPlayer(getPlayer()).getAmmo(getType().toString().toLowerCase()) < 1) {
-                buyAmmo();
-                return;
+        @EventHandler
+        protected void onPlayerInteract(PlayerInteractEvent event) {
+            Player player = event.getPlayer();
+            UUID uuid = player.getUniqueId();
+            if (!uuid.equals(gadget.owner)) return;
+            ItemStack itemStack = player.getItemInHand();
+            if (itemStack.getType() != gadget.material) return;
+            if (itemStack.getData().getData() != gadget.data) return;
+            if (player.getInventory().getHeldItemSlot() != (int) SettingsManager.getConfig().get("Gadget-Slot")) return;
+            if (Core.getCustomPlayer(getPlayer()).currentGadget != gadget) return;
+            event.setCancelled(true);
+            player.updateInventory();
+            if (Core.ammoEnabled) {
+                if (Core.getCustomPlayer(getPlayer()).getAmmo(getType().toString().toLowerCase()) < 1) {
+                    buyAmmo();
+                    return;
+                }
             }
-        }
-        if (type == GadgetType.PORTALGUN) {
-            if (getPlayer().getTargetBlock((Set<Material>) null, 20).getType() == Material.AIR) {
-                getPlayer().sendMessage("§c§lNo blocks in range!");
-                return;
+            if (type == GadgetType.PORTALGUN) {
+                if (getPlayer().getTargetBlock((Set<Material>) null, 20).getType() == Material.AIR) {
+                    getPlayer().sendMessage("§c§lNo blocks in range!");
+                    return;
+                }
             }
-        }
-        if (type == GadgetType.DISCOBALL) {
-            if (Core.discoBalls.size() > 0) {
-                getPlayer().sendMessage("§c§lThere is already a disco ball active!");
-                return;
+            if (type == GadgetType.DISCOBALL) {
+                if (Core.discoBalls.size() > 0) {
+                    getPlayer().sendMessage("§c§lThere is already a disco ball active!");
+                    return;
+                }
+                if (getPlayer().getLocation().add(0, 4, 0).getBlock() != null && getPlayer().getLocation().add(0, 4, 0).getBlock().getType() != Material.AIR) {
+                    getPlayer().sendMessage("§c§lNot enough space above you!");
+                    return;
+                }
             }
-            if (getPlayer().getLocation().add(0, 4, 0).getBlock() != null && getPlayer().getLocation().add(0, 4, 0).getBlock().getType() != Material.AIR) {
-                getPlayer().sendMessage("§c§lNot enough space above you!");
-                return;
+            if (type == GadgetType.EXPLOSIVESHEEP) {
+                if (Core.explosiveSheep.size() > 0) {
+                    getPlayer().sendMessage("§c§lThere is already an explosive sheep active!");
+                    return;
+                }
             }
-        }
-        if (type == GadgetType.EXPLOSIVESHEEP) {
-            if (Core.explosiveSheep.size() > 0) {
-                getPlayer().sendMessage("§c§lThere is already an explosive sheep active!");
-                return;
-            }
-        }
-        if (Core.countdownMap.get(getPlayer()) != null) {
-            if (Core.countdownMap.get(getPlayer()).containsKey(getType())) {
-                String timeLeft = new DecimalFormat("0.0").format(Core.countdownMap.get(getPlayer()).get(getType()));
-                if (displayCountdownMessage)
-                    getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Countdown-Message").replaceAll("%gadgetname%", configName).replaceAll("%time%", timeLeft));
-                return;
+            if (Core.countdownMap.get(getPlayer()) != null) {
+                if (Core.countdownMap.get(getPlayer()).containsKey(getType())) {
+                    String timeLeft = new DecimalFormat("0.0").format(Core.countdownMap.get(getPlayer()).get(getType()));
+                    if (displayCountdownMessage)
+                        getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Countdown-Message").replaceAll("%gadgetname%", configName).replaceAll("%time%", timeLeft));
+                    return;
+                } else {
+                    Core.countdownMap.get(getPlayer()).put(getType(), countdown);
+                }
             } else {
-                Core.countdownMap.get(getPlayer()).put(getType(), countdown);
+                Core.countdownMap.remove(getPlayer());
+                HashMap<GadgetType, Double> countdownMap = new HashMap<>();
+                countdownMap.put(getType(), countdown);
+                Core.countdownMap.put(getPlayer(), countdownMap);
             }
-        } else {
-            Core.countdownMap.remove(getPlayer());
-            HashMap<GadgetType, Double> countdownMap = new HashMap<>();
-            countdownMap.put(getType(), countdown);
-            Core.countdownMap.put(getPlayer(), countdownMap);
-        }
-        if (Core.ammoEnabled) {
-            Core.getCustomPlayer(getPlayer()).removeAmmo(getType().toString().toLowerCase());
-            getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), ItemFactory.create(material, data, "§f§l" + Core.getCustomPlayer(getPlayer()).getAmmo(type.toString().toLowerCase()) + " " + getName(), "§9Gadget"));
-        }
-        if (useTwoInteractMethods) {
-            if (event.getAction() == Action.RIGHT_CLICK_AIR
-                    || event.getAction() == Action.RIGHT_CLICK_BLOCK)
+            if (Core.ammoEnabled) {
+                Core.getCustomPlayer(getPlayer()).removeAmmo(getType().toString().toLowerCase());
+                getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), ItemFactory.create(material, data, "§f§l" + Core.getCustomPlayer(getPlayer()).getAmmo(type.toString().toLowerCase()) + " " + getName(), "§9Gadget"));
+            }
+            if (useTwoInteractMethods) {
+                if (event.getAction() == Action.RIGHT_CLICK_AIR
+                        || event.getAction() == Action.RIGHT_CLICK_BLOCK)
+                    onInteractRightClick();
+                else if (event.getAction() == Action.LEFT_CLICK_BLOCK
+                        || event.getAction() == Action.LEFT_CLICK_AIR)
+                    onInteractLeftClick();
+            } else {
                 onInteractRightClick();
-            else if (event.getAction() == Action.LEFT_CLICK_BLOCK
-                    || event.getAction() == Action.LEFT_CLICK_AIR)
-                onInteractLeftClick();
-        } else {
-            onInteractRightClick();
+            }
+
         }
 
-    }
-
-    @EventHandler
-    protected void onItemDrop(PlayerDropItemEvent event) {
-        if (event.getItemDrop().getItemStack().getType() == material) {
-            if (event.getItemDrop().getItemStack().getData().getData() == data) {
-                if (event.getItemDrop().getItemStack().getItemMeta().hasDisplayName()) {
-                    if (event.getItemDrop().getItemStack().getItemMeta().getDisplayName().endsWith(getName())) {
-                        if (SettingsManager.getConfig().get("Remove-Gadget-With-Drop")) {
-                            Core.getCustomPlayer(getPlayer()).removeGadget();
-                            event.getItemDrop().remove();
-                            return;
+        @EventHandler
+        protected void onItemDrop(PlayerDropItemEvent event) {
+            if (event.getItemDrop().getItemStack().getType() == material) {
+                if (event.getItemDrop().getItemStack().getData().getData() == data) {
+                    if (event.getItemDrop().getItemStack().getItemMeta().hasDisplayName()) {
+                        if (event.getItemDrop().getItemStack().getItemMeta().getDisplayName().endsWith(getName())) {
+                            if (SettingsManager.getConfig().get("Remove-Gadget-With-Drop")) {
+                                Core.getCustomPlayer(getPlayer()).removeGadget();
+                                event.getItemDrop().remove();
+                                return;
+                            }
+                            event.setCancelled(true);
                         }
-                        event.setCancelled(true);
                     }
                 }
             }
         }
-    }
 
-    @EventHandler
-    protected void onInventoryClick(InventoryClickEvent event) {
-        if (event.getCurrentItem().getType() == material
-                && event.getCurrentItem().getData().getData() == data
-                && event.getCurrentItem().getItemMeta().hasDisplayName()
-                && event.getCurrentItem().getItemMeta().getDisplayName().endsWith(getName())) {
-            event.setCancelled(true);
-            if (event.getWhoClicked().getItemOnCursor() != null && event.getWhoClicked().getItemOnCursor().getType() != Material.AIR)
-                event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), event.getWhoClicked().getItemOnCursor());
+        @EventHandler
+        protected void onInventoryClick(InventoryClickEvent event) {
+            if (event.getCurrentItem() != null
+                    && event.getCurrentItem().getType() == material
+                    && event.getCurrentItem().getData().getData() == data
+                    && event.getCurrentItem().getItemMeta().hasDisplayName()
+                    && event.getCurrentItem().getItemMeta().getDisplayName().endsWith(getName())) {
+                event.setCancelled(true);
+                if (event.getWhoClicked().getItemOnCursor() != null && event.getWhoClicked().getItemOnCursor().getType() != Material.AIR)
+                    event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), event.getWhoClicked().getItemOnCursor());
+            }
         }
     }
-}
 
-public enum GadgetType {
-    BATBLASTER("ultracosmetics.gadgets.batblaster", "BatBlaster"),
-    CHICKENATOR("ultracosmetics.gadgets.chickenator", "Chickenator"),
-    COLORBOMB("ultracosmetics.gadgets.colorbomb", "ColorBomb"),
-    DISCOBALL("ultracosmetics.gadgets.discoball", "DiscoBall"),
-    ETHEREALPEARL("ultracosmetics.gadgets.etherealpearl", "EtherealPearl"),
-    FLESHHOOK("ultracosmetics.gadgets.fleshhook", "FleshHook"),
-    MELONTHROWER("ultracosmetics.gadgets.melonthrower", "MelonThrower"),
-    BLIZZARDBLASTER("ultracosmetics.gadgets.blizzardblaster", "BlizzardBlaster"),
-    PORTALGUN("ultracosmetics.gadgets.portalgun", "PortalGun"),
-    EXPLOSIVESHEEP("ultracosmetics.gadgets.explosivesheep", "ExplosiveSheep"),
-    PAINTBALLGUN("ultracosmetics.gadgets.paintballgun", "PaintballGun"),
-    THORHAMMER("ultracosmetics.gadgets.thorhammer", "ThorHammer"),
-    ANTIGRAVITY("ultracosmetics.gadgets.antigravity", "AntiGravity"),
-    SMASHDOWN("ultracosmetics.gadgets.smashdown", "SmashDown");
-    //TSUNAMI("ultracosmetics.gadgets.tsunami", "Tsunami");
+    public enum GadgetType {
+        BATBLASTER("ultracosmetics.gadgets.batblaster", "BatBlaster"),
+        CHICKENATOR("ultracosmetics.gadgets.chickenator", "Chickenator"),
+        COLORBOMB("ultracosmetics.gadgets.colorbomb", "ColorBomb"),
+        DISCOBALL("ultracosmetics.gadgets.discoball", "DiscoBall"),
+        ETHEREALPEARL("ultracosmetics.gadgets.etherealpearl", "EtherealPearl"),
+        FLESHHOOK("ultracosmetics.gadgets.fleshhook", "FleshHook"),
+        MELONTHROWER("ultracosmetics.gadgets.melonthrower", "MelonThrower"),
+        BLIZZARDBLASTER("ultracosmetics.gadgets.blizzardblaster", "BlizzardBlaster"),
+        PORTALGUN("ultracosmetics.gadgets.portalgun", "PortalGun"),
+        EXPLOSIVESHEEP("ultracosmetics.gadgets.explosivesheep", "ExplosiveSheep"),
+        PAINTBALLGUN("ultracosmetics.gadgets.paintballgun", "PaintballGun"),
+        THORHAMMER("ultracosmetics.gadgets.thorhammer", "ThorHammer"),
+        ANTIGRAVITY("ultracosmetics.gadgets.antigravity", "AntiGravity"),
+        SMASHDOWN("ultracosmetics.gadgets.smashdown", "SmashDown");
+        //TSUNAMI("ultracosmetics.gadgets.tsunami", "Tsunami");
 
-    String permission;
-    public String configName;
+        String permission;
+        public String configName;
 
-    GadgetType(String permission, String configName) {
-        this.permission = permission;
-        this.configName = configName;
+        GadgetType(String permission, String configName) {
+            this.permission = permission;
+            this.configName = configName;
+        }
+
+        public String getConfigName() {
+            return configName;
+        }
+
+        public String getPermission() {
+            return permission;
+        }
+
+        public boolean isEnabled() {
+            return SettingsManager.getConfig().get("Gadgets." + configName + ".Enabled");
+        }
     }
-
-    public String getConfigName() {
-        return configName;
-    }
-
-    public String getPermission() {
-        return permission;
-    }
-
-    public boolean isEnabled() {
-        return SettingsManager.getConfig().get("Gadgets." + configName + ".Enabled");
-    }
-}
 
 }
