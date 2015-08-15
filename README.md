@@ -1,5 +1,5 @@
 # UltraCosmeticsPlugin
-A very cool cosmetics plugin for Minecraft Hub Servers.
+A very cool cosmetics plugin for Minecraft Hub Servers (Spigot 1.8.8).
 
 YOU CAN'T USE THE CODE FOR SOMETHING WHICH IS PAID. THE CODE CAN ONLY BE USED FOR A FREE PLUGIN AND IT MUST GIVE CREDIT TO ME THAT YOU USED MY CODE. THANKS
 
