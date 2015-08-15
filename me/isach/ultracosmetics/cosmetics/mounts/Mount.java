@@ -92,6 +92,8 @@ public abstract class Mount implements Listener {
         return MessageManager.getMessage("Mounts." + name + ".menu-name");
     }
 
+    public String getConfigName() { return name; }
+
     public Material getMaterial() {
         return this.material;
     }

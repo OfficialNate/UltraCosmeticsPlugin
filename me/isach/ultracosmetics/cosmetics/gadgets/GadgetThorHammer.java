@@ -8,8 +8,8 @@ import me.isach.ultracosmetics.util.MathUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
-import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.util.Vector;
 
@@ -31,7 +31,7 @@ public class GadgetThorHammer extends Gadget implements Listener {
 
     @Override
     void onInteractRightClick() {
-        final Item i = getPlayer().getWorld().dropItem(getPlayer().getEyeLocation(), ItemFactory.create(Material.IRON_AXE, (byte)0, MessageManager.getMessage("Gadgets.ThorHammer.name")));
+        final Item i = getPlayer().getWorld().dropItem(getPlayer().getEyeLocation(), ItemFactory.create(Material.IRON_AXE, (byte) 0, MessageManager.getMessage("Gadgets.ThorHammer.name")));
         i.setPickupDelay(0);
         i.setVelocity(getPlayer().getEyeLocation().getDirection().multiply(1.4));
         getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), null);
@@ -48,17 +48,21 @@ public class GadgetThorHammer extends Gadget implements Listener {
 
     @EventHandler
     public void onItemPickup(PlayerPickupItemEvent event) {
-        if(hammer.contains(event.getItem())) {
+        if (hammer.contains(event.getItem())) {
             event.setCancelled(true);
-            if(event.getPlayer() == getPlayer()) {
-                if(event.getItem().getTicksLived() > 5 ) {
-                    event.getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), event.getItem().getItemStack());
+            if (event.getPlayer() == getPlayer()) {
+                if (event.getItem().getTicksLived() > 5) {
+                    if (Core.ammoEnabled) {
+                        getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), ItemFactory.create(getMaterial(), getData(), "§f§l" + Core.getCustomPlayer(getPlayer()).getAmmo(getType().toString().toLowerCase()) + " " + getName(), "§9Gadget"));
+                    } else {
+                        getPlayer().getInventory().setItem((int) SettingsManager.getConfig().get("Gadget-Slot"), ItemFactory.create(getMaterial(), getData(), getName(), "§9Gadget"));
+                    }
                     hammer.remove(event.getItem());
                     event.getItem().remove();
                 }
             } else {
-                if(v != null)
-                MathUtils.applyVector(event.getPlayer(), v);
+                if (v != null)
+                    MathUtils.applyVector(event.getPlayer(), v);
             }
         }
     }
@@ -75,7 +79,7 @@ public class GadgetThorHammer extends Gadget implements Listener {
 
     @Override
     public void clear() {
-        for(Item i : hammer)
+        for (Item i : hammer)
             i.remove();
         hammer.clear();
         v = null;

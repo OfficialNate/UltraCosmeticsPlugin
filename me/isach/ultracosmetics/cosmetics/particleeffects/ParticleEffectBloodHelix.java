@@ -24,7 +24,7 @@ public class ParticleEffectBloodHelix extends ParticleEffect {
     @Override
     void onUpdate() {
         Location location = getPlayer().getLocation();
-        Location location2 = getPlayer().getLocation().clone();
+        Location location2 = location.clone();
         double radius = 1.1d;
         double radius2 = 1.1d;
         double particles = 100;

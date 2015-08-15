@@ -1,7 +1,6 @@
 package me.isach.ultracosmetics.cosmetics.gadgets;
 
 import me.isach.ultracosmetics.Core;
-import me.isach.ultracosmetics.config.MessageManager;
 import me.isach.ultracosmetics.util.MathUtils;
 import net.minecraft.server.v1_8_R3.EntitySheep;
 import net.minecraft.server.v1_8_R3.GenericAttributes;
@@ -10,11 +9,11 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftSheep;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Sheep;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.bukkit.event.EventHandler;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class GadgetExplosiveSheep extends Gadget {
 
         Core.explosiveSheep.add(this);
 
-        new BlockChangerRunnable(7, true, s, this);
+        new SheepColorRunnable(7, true, s, this);
     }
 
     @Override
@@ -69,13 +68,13 @@ public class GadgetExplosiveSheep extends Gadget {
 
     @EventHandler
     public void onShear(PlayerShearEntityEvent event) {
-        if(sheepArrayList.contains(event.getEntity()))
+        if (sheepArrayList.contains(event.getEntity()))
             event.setCancelled(true);
     }
 
     @EventHandler
     public void onShear(EntityDamageEvent event) {
-        if(sheepArrayList.contains(event.getEntity()))
+        if (sheepArrayList.contains(event.getEntity()))
             event.setCancelled(true);
     }
 
@@ -89,13 +88,13 @@ public class GadgetExplosiveSheep extends Gadget {
         Core.explosiveSheep.remove(this);
     }
 
-    class BlockChangerRunnable extends BukkitRunnable {
+    class SheepColorRunnable extends BukkitRunnable {
         private boolean red;
         private double time;
         private Sheep s;
         private GadgetExplosiveSheep gadgetExplosiveSheep;
 
-        public BlockChangerRunnable(double time, boolean red, Sheep s, GadgetExplosiveSheep gadgetExplosiveSheep) {
+        public SheepColorRunnable(double time, boolean red, Sheep s, GadgetExplosiveSheep gadgetExplosiveSheep) {
             this.red = red;
             this.time = time;
             this.s = s;
@@ -119,7 +118,10 @@ public class GadgetExplosiveSheep extends Gadget {
                 s.getWorld().spigot().playEffect(s.getLocation(), Effect.EXPLOSION_HUGE);
                 for (int i = 0; i < 50; i++) {
                     final Sheep sheep = getPlayer().getWorld().spawn(s.getLocation(), Sheep.class);
-                    sheep.setColor(DyeColor.values()[MathUtils.randomRangeInt(0, 15)]);
+                    try {
+                        sheep.setColor(DyeColor.values()[MathUtils.randomRangeInt(0, 15)]);
+                    } catch (Exception exc) {
+                    }
                     Random r = new Random();
                     MathUtils.applyVector(sheep, new Vector(r.nextDouble() - 0.5, r.nextDouble() / 2, r.nextDouble() - 0.5).multiply(2).add(new Vector(0, 0.8, 0)));
                     sheep.setBaby();
@@ -159,7 +161,7 @@ public class GadgetExplosiveSheep extends Gadget {
                 cancel();
             } else {
                 Bukkit.getScheduler().cancelTask(getTaskId());
-                new BlockChangerRunnable(time, red, s, gadgetExplosiveSheep);
+                new SheepColorRunnable(time, red, s, gadgetExplosiveSheep);
             }
         }
 

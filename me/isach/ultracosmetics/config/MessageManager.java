@@ -28,6 +28,18 @@ public class MessageManager {
         addMessage("Invalid-Mount", "%prefix% &c&lInvalid Mount!");
         addMessage("Invalid-Effect", "%prefix% &c&lInvalid Effect!");
         addMessage("Invalid-Menu", "%prefix% &c&lInvalid Menu!");
+        addMessage("Ammo", "&7Your ammo: &e%ammo%");
+        addMessage("Purchase", "&a&lPURCHASE");
+        addMessage("Cancel", "&c&lCANCEL");
+        addMessage("Buy-Ammo-Description", "&e§lBuy %amount% %gadgetname% ammo §e§lfor %price%$");
+        addMessage("Right-Click-Buy-Ammo", "&7Right Click to Buy Ammo");
+        addMessage("Not-Enough-Money", "%prefix% &c&lYou don't have enough money!");
+
+        //Menus
+        addMessage("Menus.Pets", "&lPets");
+        addMessage("Menus.Gadgets", "&lGadgets");
+        addMessage("Menus.Mounts", "&lMounts");
+        addMessage("Menus.Particle-Effects", "&lParticle Effects");
 
         // Gadgets
         addMessage("Gadgets.Equip", "%prefix% &9You equipped %gadgetname%");

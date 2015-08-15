@@ -4,6 +4,7 @@ import me.isach.ultracosmetics.Core;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 
@@ -30,6 +31,10 @@ public class SettingsManager {
         if (!Core.getPlugin().getDataFolder().exists()) {
             Core.getPlugin().getDataFolder().mkdir();
         }
+
+        File f = new File(Core.getPlugin().getDataFolder(), "/data");
+        if(!f.exists())
+            f.mkdirs();
 
         file = new File(Core.getPlugin().getDataFolder(), fileName + ".yml");
 
@@ -60,6 +65,16 @@ public class SettingsManager {
      */
     public static SettingsManager getConfig() {
         return config;
+    }
+
+    /**
+     * Gets the data settings manager of a player.
+     *
+     * @param p The player.
+     * @return the data settings manager of a player.
+     */
+    public static SettingsManager getData(Player p) {
+        return new SettingsManager("/data/" + p.getUniqueId().toString());
     }
 
     /**

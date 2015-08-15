@@ -1,6 +1,7 @@
 package me.isach.ultracosmetics;
 
 import me.isach.ultracosmetics.config.MessageManager;
+import me.isach.ultracosmetics.config.SettingsManager;
 import me.isach.ultracosmetics.cosmetics.gadgets.Gadget;
 import me.isach.ultracosmetics.cosmetics.mounts.Mount;
 import me.isach.ultracosmetics.cosmetics.particleeffects.ParticleEffect;
@@ -32,6 +33,18 @@ public class CustomPlayer {
     public CustomPlayer(UUID uuid) {
         this.uuid = uuid;
         Core.countdownMap.put(getPlayer(), null);
+        if (Core.ammoEnabled) {
+            if (!Core.ammoFileStorage) {
+                Core.sqlUtils.initStats(getPlayer());
+            } else {
+                SettingsManager.getData(getPlayer());
+                for(Gadget g : Core.gadgetList) {
+                    if(g.getType().isEnabled()) {
+                        SettingsManager.getData(getPlayer()).addDefault("Ammo." + g.getType().toString().toLowerCase(), 0);
+                    }
+                }
+            }
+        }
     }
 
     public Player getPlayer() {
@@ -41,15 +54,15 @@ public class CustomPlayer {
 
     public void removeGadget() {
         if (currentGadget != null) {
+            currentGadget.removeItem();
             getPlayer().sendMessage(MessageManager.getMessage("Gadgets.Unequip").replaceAll("%gadgetname%", currentGadget.getName()));
             currentGadget.clear();
-            currentGadget.removeItem();
             currentGadget = null;
         }
     }
 
     public void removeMount() {
-        if(currentMount != null) {
+        if (currentMount != null) {
             currentMount.ent.remove();
             currentMount.clear();
             currentMount = null;
@@ -58,7 +71,7 @@ public class CustomPlayer {
     }
 
     public void removePet() {
-        if(currentPet != null) {
+        if (currentPet != null) {
             currentPet.ent.remove();
             currentPet.clear();
             currentPet = null;
@@ -73,12 +86,50 @@ public class CustomPlayer {
     }
 
     public void removeParticleEffect() {
-        if(currentParticleEffect != null) {
+        if (currentParticleEffect != null) {
             getPlayer().sendMessage(MessageManager.getMessage("Particle-Effects.Unsummon").replaceAll("%effectname%", currentParticleEffect.getName()));
             currentParticleEffect = null;
         }
     }
 
+    public int getMoney() {
+        try {
+            return (int) Core.economy.getBalance(getPlayer());
+        } catch (Exception exc) {
+            return 0;
+        }
+    }
+
+    public void addAmmo(String name, int i) {
+        if (Core.ammoEnabled) {
+            if (Core.ammoFileStorage) {
+                SettingsManager.getData(getPlayer()).set("Ammo." + name, getAmmo(name) + i);
+            } else {
+                Core.sqlUtils.addAmmo(getPlayer(), name, i);
+            }
+        }
+    }
+
+    public int getAmmo(String name) {
+        if (Core.ammoEnabled) {
+            if (Core.ammoFileStorage) {
+                return (int) SettingsManager.getData(getPlayer()).get("Ammo." + name);
+            } else {
+                return Core.sqlUtils.getAmmo(getPlayer(), name);
+            }
+        }
+        return 0;
+    }
+
+    public void removeAmmo(String name) {
+        if (Core.ammoEnabled) {
+            if (Core.ammoFileStorage) {
+                SettingsManager.getData(getPlayer()).set("Ammo." + name, getAmmo(name) - 1);
+            } else {
+                Core.sqlUtils.removeAmmo(getPlayer(), name);
+            }
+        }
+    }
 
     public UUID getUuid() {
         return uuid;

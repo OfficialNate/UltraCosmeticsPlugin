@@ -16,10 +16,12 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +66,7 @@ public class MenuListener implements Listener {
         if (listSize < 8)
             slotAmount = 27;
 
-        Inventory inv = Bukkit.createInventory(null, slotAmount, "§lPets");
+        Inventory inv = Bukkit.createInventory(null, slotAmount, MessageManager.getMessage("Menus.Pets"));
 
         ItemStack pets = ItemFactory.create(Material.MONSTER_EGG, (byte) 0, MessageManager.getMessage("Menu.Pets"));
         ItemStack particleEffects = ItemFactory.create(Material.MELON_SEEDS, (byte) 0, MessageManager.getMessage("Menu.Particle-Effects"));
@@ -150,7 +152,7 @@ public class MenuListener implements Listener {
         if (Core.particleEffectList.size() < 8)
             slotAmount = 27;
 
-        Inventory inv = Bukkit.createInventory(null, slotAmount, "§lParticle Effects");
+        Inventory inv = Bukkit.createInventory(null, slotAmount, MessageManager.getMessage("Menus.Particle-Effects"));
 
         ItemStack pets = ItemFactory.create(Material.MONSTER_EGG, (byte) 0, MessageManager.getMessage("Menu.Pets"));
         ItemStack particleEffects = ItemFactory.create(Material.MELON_SEEDS, (byte) 0, MessageManager.getMessage("Menu.Particle-Effects"));
@@ -246,7 +248,7 @@ public class MenuListener implements Listener {
         if (listSize < 8)
             slotAmount = 27;
 
-        Inventory inv = Bukkit.createInventory(null, slotAmount, "§lMounts");
+        Inventory inv = Bukkit.createInventory(null, slotAmount, MessageManager.getMessage("Menus.Mounts"));
 
         ItemStack pets = ItemFactory.create(Material.MONSTER_EGG, (byte) 0, MessageManager.getMessage("Menu.Pets"));
         ItemStack particleEffects = ItemFactory.create(Material.MELON_SEEDS, (byte) 0, MessageManager.getMessage("Menu.Particle-Effects"));
@@ -336,7 +338,7 @@ public class MenuListener implements Listener {
         if (Core.gadgetList.size() < 8)
             slotAmount = 27;
 
-        Inventory inv = Bukkit.createInventory(null, slotAmount, "§lGadgets");
+        Inventory inv = Bukkit.createInventory(null, slotAmount, MessageManager.getMessage("Menus.Gadgets"));
 
         ItemStack pets = ItemFactory.create(Material.MONSTER_EGG, (byte) 0, MessageManager.getMessage("Menu.Pets"));
         ItemStack particleEffects = ItemFactory.create(Material.MELON_SEEDS, (byte) 0, MessageManager.getMessage("Menu.Particle-Effects"));
@@ -394,7 +396,7 @@ public class MenuListener implements Listener {
             }
 
             String lore = null;
-            if ((boolean)SettingsManager.getConfig().get("No-Permission.Show-In-Lore")) {
+            if (SettingsManager.getConfig().get("No-Permission.Show-In-Lore")) {
                 lore = ChatColor.translateAlternateColorCodes('&', String.valueOf(SettingsManager.getConfig().get("No-Permission.Lore-Message-" + ((p.hasPermission(g.getType().getPermission()) ? "Yes" : "No")))));
             }
             String toggle = MessageManager.getMessage("Menu.Activate");
@@ -404,6 +406,15 @@ public class MenuListener implements Listener {
             ItemStack is = ItemFactory.create(g.getMaterial(), g.getData(), toggle + " " + g.getName(), (lore != null) ? lore : null);
             if (cp.currentGadget != null && cp.currentGadget.getType() == g.getType())
                 is.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 10);
+            if (Core.ammoEnabled) {
+                ItemMeta itemMeta = is.getItemMeta();
+                List<String> loreList = itemMeta.getLore();
+                loreList.add("");
+                loreList.add(MessageManager.getMessage("Ammo").replaceAll("%ammo%", "" + Core.getCustomPlayer(p).getAmmo(g.getType().toString().toLowerCase())));
+                loreList.add(MessageManager.getMessage("Right-Click-Buy-Ammo"));
+                itemMeta.setLore(loreList);
+                is.setItemMeta(itemMeta);
+            }
             inv.setItem(i, is);
             if (i == 25 || i == 34) {
                 i += 3;
@@ -642,7 +653,7 @@ public class MenuListener implements Listener {
 
     @EventHandler
     public void gadgetSelection(InventoryClickEvent event) {
-        if (event.getInventory().getTitle().equals("§lGadgets")) {
+        if (event.getInventory().getTitle().equals(MessageManager.getMessage("Menus.Gadgets"))) {
             event.setCancelled(true);
             if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()) return;
             if (event.getCurrentItem().getItemMeta().hasDisplayName()) {
@@ -675,8 +686,17 @@ public class MenuListener implements Listener {
                         } catch (Exception exc) {
 
                         }
+
                     }
                     activateGadgetByType(getGadgetByName(sb.toString()), (Player) event.getWhoClicked());
+                    CustomPlayer cp = Core.getCustomPlayer((Player) event.getWhoClicked());
+                    if(Core.ammoEnabled && event.getAction() == InventoryAction.PICKUP_HALF) {
+                        cp.currentGadget.buyAmmo();
+                        return;
+                    }
+                    if (Core.ammoEnabled && cp.getAmmo(cp.currentGadget.getType().toString().toLowerCase()) < 1) {
+                        cp.currentGadget.buyAmmo();
+                    }
                 }
 
             }
@@ -685,7 +705,7 @@ public class MenuListener implements Listener {
 
     @EventHandler
     public void mountsSelection(InventoryClickEvent event) {
-        if (event.getInventory().getTitle().equals("§lMounts")) {
+        if (event.getInventory().getTitle().equals(MessageManager.getMessage("Menus.Mounts"))) {
             event.setCancelled(true);
             if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()) return;
             if (event.getCurrentItem().getItemMeta().hasDisplayName()) {
@@ -728,7 +748,7 @@ public class MenuListener implements Listener {
 
     @EventHandler
     public void particleEffectSelection(InventoryClickEvent event) {
-        if (event.getInventory().getTitle().equals("§lParticle Effects")) {
+        if (event.getInventory().getTitle().equals(MessageManager.getMessage("Menus.Particle-Effect"))) {
             event.setCancelled(true);
             if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()) return;
             if (event.getCurrentItem().getItemMeta().hasDisplayName()) {
@@ -771,7 +791,7 @@ public class MenuListener implements Listener {
 
     @EventHandler
     public void petSelection(InventoryClickEvent event) {
-        if (event.getInventory().getTitle().equals("§lPets")) {
+        if (event.getInventory().getTitle().equals(MessageManager.getMessage("Menus.Pets"))) {
             event.setCancelled(true);
             if (event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta()) return;
             if (event.getCurrentItem().getItemMeta().hasDisplayName()) {

@@ -10,16 +10,24 @@ import me.isach.ultracosmetics.cosmetics.particleeffects.*;
 import me.isach.ultracosmetics.cosmetics.pets.*;
 import me.isach.ultracosmetics.listeners.MenuListener;
 import me.isach.ultracosmetics.listeners.PlayerListener;
+import me.isach.ultracosmetics.mysql.MySQLConnection;
+import me.isach.ultracosmetics.mysql.Table;
 import me.isach.ultracosmetics.util.BlockUtils;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -40,6 +48,15 @@ public class Core extends JavaPlugin {
     public static ArrayList<GadgetExplosiveSheep> explosiveSheep = new ArrayList<>();
 
     public static boolean nbapiEnabled = false;
+    public static boolean ammoEnabled = false;
+    public static boolean ammoFileStorage = true;
+
+    public static Economy economy = null;
+
+    private MySQLConnection sql;
+    private Connection co; // SQL Connection.
+    public Table table; // SQL Table.
+    public static SQLUtils sqlUtils; // SQL Utils.
 
     @Override
     public void onEnable() {
@@ -72,7 +89,7 @@ public class Core extends JavaPlugin {
         gadgetList.add(new GadgetSmashDown(null));
         gadgetList.add(new GadgetExplosiveSheep(null));
         gadgetList.add(new GadgetAntiGravity(null));
-        // gadgetList.add(new GadgetTsunami(null));
+        // gadgetList.addAmmo(new GadgetTsunami(null));
 
         // Register Mounts
         mountList.add(new MountDruggedHorse(null));
@@ -110,6 +127,13 @@ public class Core extends JavaPlugin {
         getCommand("ultracosmetics").setTabCompleter(new UltraCosmeticsTabCompleter());
 
         // Set config things.
+        SettingsManager.getConfig().addDefault("Ammo-System-For-Gadgets.Enabled", false);
+        SettingsManager.getConfig().addDefault("Ammo-System-For-Gadgets.System", "file");
+        SettingsManager.getConfig().addDefault("Ammo-System-For-Gadgets.MySQL.hostname", "localhost");
+        SettingsManager.getConfig().addDefault("Ammo-System-For-Gadgets.MySQL.username", "root");
+        SettingsManager.getConfig().addDefault("Ammo-System-For-Gadgets.MySQL.password", "password");
+        SettingsManager.getConfig().addDefault("Ammo-System-For-Gadgets.MySQL.port", "3306");
+        SettingsManager.getConfig().addDefault("Ammo-System-For-Gadgets.MySQL.database", "UltraCosmetics");
         SettingsManager.getConfig().addDefault("Menu-Item.Give-On-Join", true);
         SettingsManager.getConfig().addDefault("Menu-Item.Slot", 3);
         SettingsManager.getConfig().addDefault("Menu-Item.Type", "ENDER_CHEST");
@@ -129,25 +153,91 @@ public class Core extends JavaPlugin {
         SettingsManager.getConfig().addDefault("Disabled-Items.Custom-Disabled-Item.Name", "&c&lDisabled");
 
         SettingsManager.getConfig().addDefault("Gadget-Slot", 4);
+        SettingsManager.getConfig().addDefault("Remove-Gadget-With-Drop", false);
 
         for (Gadget gadget : gadgetList) {
             SettingsManager.getConfig().addDefault("Gadgets." + gadget.getType().configName + ".Enabled", true);
+            SettingsManager.getConfig().addDefault("Gadgets." + gadget.getType().configName + ".Ammo.Price", 500);
+            SettingsManager.getConfig().addDefault("Gadgets." + gadget.getType().configName + ".Ammo.Result-Amount", 20);
         }
 
-        SettingsManager.getConfig().addDefault("Mounts.DruggedHorse.Enabled", true);
-        SettingsManager.getConfig().addDefault("Mounts.EcologistHorse.Enabled", true);
-        SettingsManager.getConfig().addDefault("Mounts.GlacialSteed.Enabled", true);
-        SettingsManager.getConfig().addDefault("Mounts.InfernalHorror.Enabled", true);
-        SettingsManager.getConfig().addDefault("Mounts.MountOfFire.Enabled", true);
-        SettingsManager.getConfig().addDefault("Mounts.MountOfWater.Enabled", true);
-        SettingsManager.getConfig().addDefault("Mounts.Snake.Enabled", true);
-        SettingsManager.getConfig().addDefault("Mounts.WalkingDead.Enabled", true);
+        for (Mount m : mountList)
+            SettingsManager.getConfig().addDefault("Mounts." + m.getConfigName() + ".Enabled", true);
 
-        for (ParticleEffect particleEffect : particleEffectList) {
+        for (ParticleEffect particleEffect : particleEffectList)
             SettingsManager.getConfig().addDefault("Particle-Effects." + particleEffect.getConfigName() + ".Enabled", true);
-        }
-        for (Pet pet : petList) {
+
+        for (Pet pet : petList)
             SettingsManager.getConfig().addDefault("Pets." + pet.getConfigName() + ".Enabled", true);
+
+        ammoEnabled = SettingsManager.getConfig().get("Ammo-System-For-Gadgets.Enabled");
+
+        ammoFileStorage = String.valueOf(SettingsManager.getConfig().get("Ammo-System-For-Gadgets.System")).equalsIgnoreCase("file");
+
+        if (ammoEnabled) {
+            if(!Bukkit.getPluginManager().isPluginEnabled("Vault")) {
+                Bukkit.getLogger().info("");
+                Bukkit.getConsoleSender().sendMessage("§c§lVault not found!");
+                Bukkit.getLogger().info("");
+                Bukkit.getConsoleSender().sendMessage("§c§lServer shutting down, please install Vault to use Ammo System!");
+                Bukkit.getLogger().info("");
+                Bukkit.shutdown();
+                return;
+            }
+            setupEconomy();
+            if (!ammoFileStorage) {
+                try {
+                    String hostname = String.valueOf(SettingsManager.getConfig().get("Ammo-System-For-Gadgets.MySQL.hostname"));
+                    String portNumber = String.valueOf(SettingsManager.getConfig().get("Ammo-System-For-Gadgets.MySQL.port"));
+                    String database = String.valueOf(SettingsManager.getConfig().get("Ammo-System-For-Gadgets.MySQL.database"));
+                    String username = String.valueOf(SettingsManager.getConfig().get("Ammo-System-For-Gadgets.MySQL.username"));
+                    String password = String.valueOf(SettingsManager.getConfig().get("Ammo-System-For-Gadgets.MySQL.password"));
+                    sql = new MySQLConnection(hostname, portNumber, database, username, password);
+                    co = sql.getConnection();
+
+                    Bukkit.getLogger().info("");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getConsoleSender().sendMessage("§b§lUltraCosmetics >>> Successfully connected to MySQL server! :)");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getLogger().info("");
+                    PreparedStatement sql = co.prepareStatement("CREATE TABLE IF NOT EXISTS UltraCosmeticsData(" +
+                            "id INTEGER not NULL AUTO_INCREMENT," +
+                            " uuid VARCHAR(255)," +
+                            " username VARCHAR(255),"
+                            + " PRIMARY KEY ( id ))");
+                    sql.executeUpdate();
+                    for (Gadget gadget : gadgetList) {
+                        DatabaseMetaData md = co.getMetaData();
+                        ResultSet rs = md.getColumns(null, null, "UltraCosmeticsData", gadget.getType().toString().toLowerCase());
+                        if (!rs.next()) {
+                            PreparedStatement statement = co.prepareStatement("ALTER TABLE UltraCosmeticsData ADD " + gadget.getType().toString().toLowerCase() + " INTEGER DEFAULT 0 not NULL");
+                            statement.executeUpdate();
+                        }
+
+                    }
+                    table = new Table(co, "UltraCosmeticsData");
+                    sqlUtils = new SQLUtils(this);
+
+                } catch (Exception e) {
+
+                    Bukkit.getLogger().info("");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getConsoleSender().sendMessage("§c§lUltra Cosmetics >>> Could not connect to MySQL server!");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getConsoleSender().sendMessage("§c§lError:");
+                    e.printStackTrace();
+                    Bukkit.getLogger().info("");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getConsoleSender().sendMessage("§c§lServer shutting down, please check the MySQL info!");
+                    Bukkit.getLogger().info("");
+                    Bukkit.getLogger().info("");
+                    Bukkit.shutdown();
+
+                }
+            }
         }
 
         for (Player p : Bukkit.getOnlinePlayers())
@@ -164,9 +254,9 @@ public class Core extends JavaPlugin {
                             iter.remove();
                     }
                     Iterator<CustomPlayer> customPlayerIterator = customPlayers.iterator();
-                    while(iter.hasNext()) {
+                    while (iter.hasNext()) {
                         CustomPlayer customPlayer = customPlayerIterator.next();
-                        if(customPlayer.getPlayer() == null)
+                        if (customPlayer.getPlayer() == null)
                             customPlayerIterator.remove();
                     }
                     for (Player p : countdownMap.keySet()) {
@@ -193,13 +283,25 @@ public class Core extends JavaPlugin {
         };
         countdownRunnable.runTaskTimerAsynchronously(Core.getPlugin(), 0, 1);
 
-        if (nbapiEnabled) {
+        if (nbapiEnabled)
+
+        {
             File folder = new File(getDataFolder().getPath() + "/songs/");
             if ((!folder.exists()) || (folder.listFiles().length <= 0)) {
 
                 saveResource("songs/GetLucky.nbs", true);
             }
         }
+
+    }
+
+    private boolean setupEconomy() {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
+
+        return (economy != null);
     }
 
     @Override
