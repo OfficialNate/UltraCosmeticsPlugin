@@ -1,6 +1,8 @@
 # UltraCosmeticsPlugin
 A very cool cosmetics plugin for Minecraft Hub Servers.
 
+YOU CAN'T USE THE CODE FOR SOMETHING WHICH IS PAID. THE CODE CAN ONLY BE USED FOR A FREE PLUGIN AND IT MUST GIVE CREDIT TO ME THAT YOU USED MY CODE. THANKS
+
 Normally, you should find out easily how to add a new cosmetic but I'll show an example with a Gadget that we'll 
 name "Example".
 
